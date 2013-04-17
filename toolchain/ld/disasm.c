@@ -86,8 +86,8 @@ struct opcode {
   { "cl_d",	0x00ad,	0xffff, OPCODE_NO_OPS,		BASIC },
   { "cl_e",	0x00ae,	0xffff, OPCODE_NO_OPS,		BASIC },
   { "ccc",	0x00af,	0xffff, OPCODE_NO_OPS,		BASIC },
-  { "se_0",	0x00b0,	0xffff, OPCODE_NO_OPS,		BASIC },
-  { "sec",	0x00a1,	0xffff, OPCODE_NO_OPS,		BASIC },
+  { "nop1",	0x00b0,	0xffff, OPCODE_NO_OPS,		BASIC },
+  { "sec",	0x00b1,	0xffff, OPCODE_NO_OPS,		BASIC },
   { "sev",	0x00b2,	0xffff, OPCODE_NO_OPS,		BASIC },
   { "se_3",	0x00b3,	0xffff, OPCODE_NO_OPS,		BASIC },
   { "sez",	0x00b4,	0xffff, OPCODE_NO_OPS,		BASIC },
@@ -338,14 +338,14 @@ prsym (addr)
 	for (p=stab; p<stab+stabindex; ++p) {
 		if (p->n_value == addr && ((p->n_type & N_TYPE) == N_TEXT ||
 		    (p->n_type & N_TYPE) == N_DATA)) {
-			printf ("%06o <%.8s>:\n", addr, p->n_name);
+			printf ("%06o               %.8s:\n", addr, p->n_name);
 			++printed;
 		}
 	}
 	if (printed == 0 && addr == 0)
-		printf ("%06o <.text>:\n", 0);
+		printf ("%06o               .text:\n", 0);
 	if (printed == 0 && addr == hdr.a_text)
-		printf ("%06o <.data>:\n", hdr.a_text);
+		printf ("%06o               .data:\n", hdr.a_text);
 }
 
 /*
@@ -782,7 +782,7 @@ prsection (addr, limit)
 
 	while (*addr < limit) {
 		prsym (*addr);
-		printf ("%6o:", *addr);
+		printf ("%06o", *addr);
 		opcode = freadw (textfd);
 		if (relfd)
 			relcode = freadw (relfd);

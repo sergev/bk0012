@@ -1,0 +1,43 @@
+[*]
+[*] GTKWave Analyzer v3.3.40 (w)1999-2012 BSI
+[*] Sun Mar 31 07:02:52 2013
+[*]
+[dumpfile] "bksim.vcd"
+[dumpfile_mtime] "Sun Mar 31 07:01:57 2013"
+[dumpfile_size] 49556
+[savefile] "databus.gtkw"
+[timestart] 0
+[size] 1755 600
+[pos] 46 0
+*-13.904783 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 223
+[signals_width] 190
+[sst_expanded] 1
+[sst_vpaned_height] 169
+@28
+clk
+reset
+@22
+instr_address[31:0]
+@28
+instr_read
+@22
+instr_readdata[31:0]
+@28
+instr_readdatavalid
+instr_waitrequest
+@22
+data_address[31:0]
+@28
+data_byteenable[1:0]
+data_read
+@22
+data_readdata[15:0]
+@28
+data_readdatavalid
+data_waitrequest
+data_write
+@22
+data_writedata[15:0]
+[pattern_trace] 1
+[pattern_trace] 0
