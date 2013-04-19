@@ -1,7 +1,7 @@
 all:            po1.oct po4.oct
 
 po1.oct:        po1.bin
-		od -w2 -o -Ao -v $< > $@
+		pdp11-disasm -b -a0 $< > $@
 
 po4.oct:        po4.bin
-		od -w2 -o -Ao -v $< > $@
+		pdp11-disasm -b -a0 $< > $@
