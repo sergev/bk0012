@@ -127,8 +127,6 @@ begin
 				dout.wr_rdy <= not avm_waitrequest;
 			elsif	map_out.io_cs = '1' then
 				dout.wr_rdy <= not avm_io_waitrequest;
-			elsif map_out.irps_cs = '1' then
-				dout.wr_rdy <= '1';
 			else
 				dout.wr_rdy <= '0';
 			end if;

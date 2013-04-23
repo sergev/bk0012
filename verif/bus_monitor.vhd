@@ -11,7 +11,8 @@ use work.pdp11_disasm.all;
 
 entity bus_monitor is
   generic (
-    enable  : boolean := TRUE                 -- enable monitoring
+    enable          : boolean := TRUE;        -- enable monitoring
+	  TRACE_FILE_NAME : string                  -- output to this file
   );
   port (
     clk                 : in std_logic;       -- clock
@@ -52,6 +53,7 @@ begin
 
     enabled_monitor : process (clk)
 
+      file fd : text is out TRACE_FILE_NAME;
       variable L : line;
       variable under_reset: boolean := FALSE;
       variable latch_instr_address: std_logic_vector(31 downto 0);
@@ -91,7 +93,7 @@ begin
           write(L, string'(" "));
           write(L, disassemble(insn.opcode, insn.immed1, insn.immed2,
             '1', insn.immed1_rdy, insn.immed2_rdy));
-          writeline(output, L);
+          writeline(fd, L);
         end if;
       end print_insn;
 
@@ -106,7 +108,7 @@ begin
             write(L, '(');
             write(L, integer'image(now / CLOCK_PERIOD));
             write(L, string'(") Reset"));
-            writeline(output, L);
+            writeline(fd, L);
             under_reset := TRUE;
           end if;
         else
@@ -114,7 +116,7 @@ begin
             write(L, '(');
             write(L, integer'image(now / CLOCK_PERIOD));
             write(L, string'(") End Reset"));
-            writeline(output, L);
+            writeline(fd, L);
             under_reset := FALSE;
           end if;
 
@@ -125,7 +127,7 @@ begin
           --  write(L, '(');
           --  write(L, integer'image(now / CLOCK_PERIOD));
           --  write(L, string'(") ------"));
-          --  writeline(output, L);
+          --  writeline(fd, L);
           --end if;
           --if trace.ID_stall = '0' then
           --  print_insn (trace.ID_insn, "id ");
@@ -151,52 +153,55 @@ begin
             write(L, integer'image(now / CLOCK_PERIOD));
             write(L, string'(")    r0 = "));
             owrite(L, "00" & trace.gpr(0));
-            writeline(output, L);
+            writeline(fd, L);
           end if;
           if trace.gpr_mask(1) = '1' then
             write(L, '(');
             write(L, integer'image(now / CLOCK_PERIOD));
             write(L, string'(")    r1 = "));
             owrite(L, "00" & trace.gpr(1));
-            writeline(output, L);
+            writeline(fd, L);
           end if;
           if trace.gpr_mask(2) = '1' then
             write(L, '(');
             write(L, integer'image(now / CLOCK_PERIOD));
             write(L, string'(")    r2 = "));
             owrite(L, "00" & trace.gpr(2));
-            writeline(output, L);
+            writeline(fd, L);
           end if;
           if trace.gpr_mask(3) = '1' then
             write(L, '(');
             write(L, integer'image(now / CLOCK_PERIOD));
             write(L, string'(")    r3 = "));
             owrite(L, "00" & trace.gpr(3));
-            writeline(output, L);
+            writeline(fd, L);
           end if;
           if trace.gpr_mask(4) = '1' then
             write(L, '(');
             write(L, integer'image(now / CLOCK_PERIOD));
             write(L, string'(")    r4 = "));
             owrite(L, "00" & trace.gpr(4));
-            writeline(output, L);
+            writeline(fd, L);
           end if;
           if trace.gpr_mask(5) = '1' then
             write(L, '(');
             write(L, integer'image(now / CLOCK_PERIOD));
             write(L, string'(")    r5 = "));
             owrite(L, "00" & trace.gpr(5));
-            writeline(output, L);
+            writeline(fd, L);
           end if;
           if trace.gpr_mask(6) = '1' then
             write(L, '(');
             write(L, integer'image(now / CLOCK_PERIOD));
             write(L, string'(")    sp = "));
             owrite(L, "00" & trace.gpr(6));
-            writeline(output, L);
+            writeline(fd, L);
           end if;
 
-          if instr_read = '1' then                    -- Fetch address
+          --
+          -- Fetch.
+          --
+          if instr_read = '1' then
             latch_instr_address := instr_address;
           end if;
 
@@ -211,10 +216,13 @@ begin
             owrite(L, "00" & instr_readdata(31 downto 16));
             write(L, string'(" "));
             owrite(L, "00" & instr_readdata(15 downto 0));
-            writeline(output, L);
+            writeline(fd, L);
           end if;
 
-          if data_read = '1' or data_write = '1' then -- Read/write address
+          --
+          -- Data read/write.
+          --
+          if data_read = '1' or data_write = '1' then
             latch_data_address := data_address;
           end if;
 
@@ -227,7 +235,7 @@ begin
             owrite(L, "00" & latch_data_address(15 downto 0));
             write(L, string'("] -> "));
             owrite(L, "00" & data_readdata(15 downto 0));
-            writeline(output, L);
+            writeline(fd, L);
           end if;
 
           if data_write = '1' then                    -- Write data
@@ -253,8 +261,54 @@ begin
                 write(L, string'("xxxxxx"));
               end if;
             end if;
-            writeline(output, L);
+            writeline(fd, L);
           end if;
+
+          --
+          -- I/O read/write.
+          --
+          if io_read = '1' or io_write = '1' then
+            latch_io_address := io_address;
+          end if;
+
+          if io_readdatavalid = '1' then            -- Read input
+            write(L, '(');
+            write(L, integer'image(now / CLOCK_PERIOD));
+            write(L, string'(")                                           Input ["));
+            --owrite(L, "00" & latch_io_address(31 downto 16));
+            --write(L, string'(" "));
+            owrite(L, "00" & latch_io_address(15 downto 0));
+            write(L, string'("] -> "));
+            owrite(L, "00" & io_readdata(15 downto 0));
+            writeline(fd, L);
+          end if;
+
+          if io_write = '1' then                    -- Write output
+            write(L, '(');
+            write(L, integer'image(now / CLOCK_PERIOD));
+            write(L, string'(")                                           Output ["));
+            --owrite(L, "00" & io_address(31 downto 16));
+            --write(L, string'(" "));
+            owrite(L, "00" & io_address(15 downto 0));
+            write(L, string'("] <- "));
+            if io_byteenable(0) = '1' then
+              if io_byteenable(1) = '1' then
+                owrite(L, "00" & io_writedata(15 downto 0));
+              else
+                write(L, string'("xxx"));
+                owrite(L, "0" & io_writedata(7 downto 0));
+              end if;
+            else
+              if io_byteenable(1) = '1' then
+                owrite(L, "00" & io_writedata(15 downto 8) & "00");
+                write(L, string'("xx"));
+              else
+                write(L, string'("xxxxxx"));
+              end if;
+            end if;
+            writeline(fd, L);
+          end if;
+
         end if;
       end if;
     end process enabled_monitor;

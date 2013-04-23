@@ -8,14 +8,14 @@ package def is
 	constant PHYSICAL_ADDRESS_WIDTH: natural := 16;
 	constant PC_LOW: natural := 1;
 
-	constant SP_REG: std_logic_vector(3 downto 0) := "0110";	-- SP register number
-	constant PC_REG: std_logic_vector(3 downto 0) := "0111";	-- PC register number
-	constant TEMP1: std_logic_vector(3 downto 0) := "1000";	-- temporary register 1 number
-	constant TEMP2: std_logic_vector(3 downto 0) := "1001";	-- temporary register 2 number
-	constant PSW_REG: std_logic_vector(3 downto 0) := "1010";	-- immediate virtual register number
+	constant SP_REG:   std_logic_vector(3 downto 0) := "0110";	-- SP register number
+	constant PC_REG:   std_logic_vector(3 downto 0) := "0111";	-- PC register number
+	constant TEMP1:    std_logic_vector(3 downto 0) := "1000";	-- temporary register 1 number
+	constant TEMP2:    std_logic_vector(3 downto 0) := "1001";	-- temporary register 2 number
+	constant PSW_REG:  std_logic_vector(3 downto 0) := "1010";	-- immediate virtual register number
 	constant PSW_REG2: std_logic_vector(3 downto 0) := "1011";	-- immediate virtual register number
-	constant IMM_REG: std_logic_vector(3 downto 0) := "1101";	-- immediate virtual register number
-	constant MEM_REG: std_logic_vector(3 downto 0) := "1110";	-- memory load virtual register number
+	constant IMM_REG:  std_logic_vector(3 downto 0) := "1101";	-- immediate virtual register number
+	constant MEM_REG:  std_logic_vector(3 downto 0) := "1110";	-- memory load virtual register number
 	constant ZERO_REG: std_logic_vector(3 downto 0) := "1111";	-- ZERO virtual register number
 
 	constant ROM_START_ADDRESS: std_logic_vector(31 downto 0) := x"00000000";
@@ -36,7 +36,6 @@ package def is
 		rom_cs: std_logic;
 		ram_cs: std_logic;
 		io_cs:  std_logic;
-		irps_cs: std_logic;
 	end record;
 
 	function address_map(ain: address_map_in) return address_map_out;
@@ -130,23 +129,16 @@ package body def is
 		v.rom_cs := '0';
 		v.ram_cs := '0';
 		v.io_cs := '0';
-		v.irps_cs := '0';
 
-		if ain.address(15) = '0' or
-	     ain.address(15 downto 0) = "1111111101110110" then -- 177566 - output port
+    -- PDP-11 address map, compatible with ELectronika-60.
+    if ain.address(15 downto 13) = "111" then
+      -- 160000-177777: system registers
+      v.io_cs := '1';
+			v.address := IO_START_ADDRESS or (x"0000" & ain.address);
+    else
+      -- 000000-157777: RAM space
 			v.ram_cs := '1';
 			v.address := RAM_START_ADDRESS or (x"0000" & ain.address);
-		else
-			if ain.address(14 downto 7) = "11111111" then -- 177600 - system registers
-				v.io_cs := '1';
-				v.address := IO_START_ADDRESS or (x"0000" & ain.address);
-			elsif ain.address(14 downto 3) = "111110101110" then
-				v.irps_cs := '1';
-				v.address := IO_START_ADDRESS or (x"0000" & ain.address);
-			else
-				v.rom_cs := '1';
-				v.address := ROM_START_ADDRESS or (x"0000" & ain.address);
-			end if;
 		end if;
 		return v;
 	end function address_map;

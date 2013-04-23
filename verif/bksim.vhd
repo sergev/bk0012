@@ -2,116 +2,20 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.iface.all;
---use work.textio.all;
+use work.moonshiner11;
+use work.resetgen;
+use work.memory;
+use work.sysreg;
+use work.bus_monitor;
 
 entity bksim is
 end bksim;
 
 architecture bench of bksim is
 
-  constant CLOCK_PERIOD : Time := 1000 ns;      -- Use 1us as a base cycle
-
-  component resetgen is                         -- Reset generator
-    port (
-      clk     : in  std_logic := 'X';
-      reset   : out std_logic;
-      reset_n : out std_logic
-    );
-  end component resetgen;
-
-  component moonshiner11 is                     -- PDP-11 processor
-    port (
-      clk                      : in  std_logic                     := 'X';
-      reset                    : in  std_logic                     := 'X';
-      reset_out                : out std_logic;
-      int_reset_out            : out std_logic;
-      irq                      : in  std_logic                     := 'X';
-      ivec                     : in  std_logic_vector(7 downto 0)  := (others => 'X');
-      iack                     : out std_logic;
-      avm_icache_address       : out std_logic_vector(31 downto 0);
-      avm_icache_burstcount    : out std_logic_vector(3 downto 0);
-      avm_icache_read          : out std_logic;
-      avm_icache_readdata      : in  std_logic_vector(31 downto 0) := (others => 'X');
-      avm_icache_readdatavalid : in  std_logic                     := 'X';
-      avm_icache_waitrequest   : in  std_logic                     := 'X';
-      avm_icache_flush         : out std_logic;
-      avm_dcache_address       : out std_logic_vector(31 downto 0);
-      avm_dcache_burstcount    : out std_logic_vector(3 downto 0);
-      avm_dcache_read          : out std_logic;
-      avm_dcache_readdata      : in  std_logic_vector(15 downto 0) := (others => 'X');
-      avm_dcache_readdatavalid : in  std_logic                     := 'X';
-      avm_dcache_write         : out std_logic;
-      avm_dcache_writedata     : out std_logic_vector(15 downto 0);
-      avm_dcache_byteenable    : out std_logic_vector(1 downto 0);
-      avm_dcache_waitrequest   : in  std_logic                     := 'X';
-      avm_io_address           : out std_logic_vector(31 downto 0);
-      avm_io_read              : out std_logic;
-      avm_io_readdata          : in  std_logic_vector(15 downto 0) := (others => 'X');
-      avm_io_readdatavalid     : in  std_logic                     := 'X';
-      avm_io_write             : out std_logic;
-      avm_io_writedata         : out std_logic_vector(15 downto 0);
-      avm_io_byteenable        : out std_logic_vector(1 downto 0);
-      avm_io_waitrequest       : in  std_logic                     := 'X';
-      avs_dbg_address          : in  std_logic_vector(8 downto 0)  := (others => 'X');
-      avs_dbg_writedata        : in  std_logic_vector(15 downto 0) := (others => 'X');
-      avs_dbg_chipselect       : in  std_logic                     := 'X';
-      avs_dbg_read             : in  std_logic                     := 'X';
-      avs_dbg_write            : in  std_logic                     := 'X';
-      avs_dbg_readdata         : out std_logic_vector(15 downto 0);
-      trace                    : out trace_type
-    );
-  end component moonshiner11;
-
-  component bus_monitor is
-    port (
-      clk                 : in std_logic;
-    	reset               : in std_logic;
-      irq                 : in std_logic;
-      ivec                : in std_logic_vector(7 downto 0);
-      iack                : in std_logic;
-      instr_address       : in std_logic_vector(31 downto 0);
-      instr_read          : in std_logic;
-      instr_readdata      : in std_logic_vector(31 downto 0);
-      instr_readdatavalid : in std_logic;
-      instr_waitrequest   : in std_logic;
-      data_address        : in std_logic_vector(31 downto 0);
-      data_read           : in std_logic;
-      data_readdata       : in std_logic_vector(15 downto 0);
-      data_readdatavalid  : in std_logic;
-      data_write          : in std_logic;
-      data_writedata      : in std_logic_vector(15 downto 0);
-      data_byteenable     : in std_logic_vector(1 downto 0);
-      data_waitrequest    : in std_logic;
-      io_address          : in std_logic_vector(31 downto 0);
-      io_read             : in std_logic;
-      io_readdata         : in std_logic_vector(15 downto 0);
-      io_readdatavalid    : in std_logic;
-      io_write            : in std_logic;
-      io_writedata        : in std_logic_vector(15 downto 0);
-      io_byteenable       : in std_logic_vector(1 downto 0);
-      io_waitrequest      : in std_logic;
-      trace               : in trace_type
-    );
-  end component;
-
-  component memory is
-    port (
-      clk              : in  std_logic;
-      p1_address       : in  std_logic_vector(31 downto 0);
-      p1_waitrequest   : out std_logic;
-      p1_read          : in  std_logic;
-      p1_readdata      : out std_logic_vector(15 downto 0);
-      p1_readdatavalid : out std_logic;
-      p1_write         : in  std_logic;
-      p1_writedata     : in  std_logic_vector(15 downto 0);
-      p1_byteenable    : in  std_logic_vector(1 downto 0);
-      p2_address       : in  std_logic_vector(31 downto 0);
-      p2_waitrequest   : out std_logic;
-      p2_read          : in  std_logic;
-      p2_readdata      : out std_logic_vector(31 downto 0);
-      p2_readdatavalid : out std_logic
-    );
-  end component;
+  constant CLOCK_PERIOD    : Time   := 1000 ns;         -- Use 1us as a base cycle
+	constant LOAD_FILE_NAME  : string := "input.oct";     -- Initial contents of memory
+	constant TRACE_FILE_NAME : string := "output.trace";  -- Initial contents of memory
 
   signal clk           : std_logic;
   signal reset         : std_logic;
@@ -153,14 +57,14 @@ architecture bench of bksim is
 
 begin
 
-  rg : component resetgen               -- Generate reset at startup
+  rg : entity resetgen                  -- Generate reset at startup
     port map (
       clk     => clk,
       reset   => reset,
       reset_n => open
     );
 
-  cpu : component moonshiner11
+  cpu : entity moonshiner11             -- PDP-11 processor
     port map (
       clk                      => clk,                  -- in
       reset                    => reset,                -- in
@@ -202,7 +106,10 @@ begin
       trace                    => trace                 -- out
     );
 
-  bm : component bus_monitor            -- Print trace information
+  bm : entity bus_monitor               -- Print trace information
+    generic map (
+      TRACE_FILE_NAME => TRACE_FILE_NAME
+    )
     port map (
       clk                 => clk,
       reset               => reset,
@@ -233,7 +140,11 @@ begin
       trace               => trace
     );
 
-  mem : component memory                -- RAM
+  mem : entity memory                   -- RAM
+    generic map (
+      MEM_SIZE       => 64*1024,        -- 64 kbytes
+      LOAD_FILE_NAME => LOAD_FILE_NAME
+    )
     port map (
       clk              => clk,
       p1_address       => data_address,       -- in
@@ -251,14 +162,24 @@ begin
       p2_readdatavalid => instr_readdatavalid -- out
     );
 
+  sreg : entity sysreg                  -- System registers
+    port map (
+      clk              => clk,
+      io_address       => io_address(12 downto 0), -- in
+      io_waitrequest   => io_waitrequest,     -- out
+      io_read          => io_read,            -- in
+      io_readdata      => io_readdata,        -- out
+      io_readdatavalid => io_readdatavalid,   -- out
+      io_write         => io_write,           -- in
+      io_writedata     => io_writedata,       -- in
+      io_byteenable    => io_byteenable       -- in
+    );
+
   clock_gen : process                   -- Generate main clock
   begin
     if reset = '1' then                 -- Initial state
       irq               <= '0';
       ivec              <= x"00";
-      io_readdata       <= x"0000";
-      io_readdatavalid  <= '0';
-      io_waitrequest    <= '0';
     end if;
 
     if trace.halt = '1' and trace.ID_insn.rdy = '0' and trace.ID2_insn.rdy = '0' and

@@ -6,8 +6,8 @@ use std.textio.all;
 entity memory is
 
   generic (
-    MEM_SIZE       : positive := 64*1024;
-	  LOAD_FILE_NAME : string := "memory.oct"
+    MEM_SIZE       : positive;
+	  LOAD_FILE_NAME : string
   );
 
   port (
