@@ -88,4 +88,4 @@ dcache_stub.o gpr.o dummy_debugger.o ibuffer.o icache_stub.o iface.o moonshiner1
 alu.o dcache_stub.o gpr.o dummy_debugger.o ibuffer.o icache_stub.o moonshiner11.o bus_monitor.o bksim.o: iface.o
 dcache_stub.o icache_stub.o moonshiner11.o: config.o
 bus_monitor.o: textio.o pdp11_disasm.o
-bksim.o: bus_monitor.o sysreg.o moonshiner11.o
+bksim.o: bus_monitor.o sysreg.o moonshiner11.o memory.o

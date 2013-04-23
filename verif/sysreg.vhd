@@ -20,6 +20,26 @@ entity sysreg is
 end entity sysreg;
 
 architecture behavior of sysreg is
+
+  constant UART_RECEIVE_STATUS  : integer := 8#17560#;
+  constant UART_RECEIVE_DATA    : integer := 8#17562#;
+  constant UART_TRANSMIT_STATUS : integer := 8#17564#;
+  constant UART_TRANSMIT_DATA   : integer := 8#17566#;
+
+  --
+  -- Receive status register
+  --
+  constant UART_RS_BUSY         : integer := 8#4000#;   -- Set by start bit, cleared by stop bit
+  constant UART_RS_DONE         : integer := 8#0200#;   -- Data available, cleared by enable
+  constant UART_RS_IE           : integer := 8#0100#;   -- Interrupt enable
+  constant UART_RS_ENABLE       : integer := 8#0001#;   -- Reader enable, cleared by start bit
+
+  --
+  -- Transmit status register
+  --
+  constant UART_TS_READY        : integer := 8#0200#;   -- Transmit available, read only
+  constant UART_TS_IE           : integer := 8#0100#;   -- Interrupt enable
+
 begin
 
   sreg : process is
@@ -44,7 +64,7 @@ begin
       --
       if io_write = '1' then
         case io_index is
-          when 8#17566# =>              -- Output port
+          when UART_TRANSMIT_DATA =>
             report "Output " & character'image(character'val(to_integer(unsigned(io_writedata(7 downto 0)))));
           when others =>
             report "I/O write unknown port " & integer'image(io_index);
@@ -55,8 +75,8 @@ begin
       --
       elsif io_read = '1' then
         case io_index is
-          when 8#17564# =>              -- Status of output port
-            io_readdata <= std_logic_vector(to_unsigned(8#200#, 16));
+          when UART_TRANSMIT_STATUS =>
+            io_readdata <= std_logic_vector(to_unsigned(UART_TS_READY, 16));
 --report "Poll output";
 --        when 8#1376# / 2 =>           -- Address of output port
 --          io_readdata <= std_logic_vector(to_unsigned(8#177566#, 16));

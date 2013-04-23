@@ -51,7 +51,7 @@ begin
 
   monitor : if enable generate
 
-    enabled_monitor : process (clk)
+    enabled_monitor : process
 
       file fd : text is out TRACE_FILE_NAME;
       variable L : line;
@@ -98,10 +98,12 @@ begin
       end print_insn;
 
     begin
-      --
-      -- wait for a command, valid on falling edge of clk
-      --
-      if clk'event and clk = '1' then
+      write(L, string'("Trace file """ & TRACE_FILE_NAME) & """");
+      writeline(output, L);
+
+      loop
+        -- Wait for a command, valid on leading edge of clk
+        wait until clk = '1';
 
         if reset = '1' then
           if not under_reset then                   -- Reset
@@ -310,7 +312,7 @@ begin
           end if;
 
         end if;
-      end if;
+      end loop;
     end process enabled_monitor;
 
   end generate;

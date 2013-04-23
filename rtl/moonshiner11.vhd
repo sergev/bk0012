@@ -810,7 +810,11 @@ begin
 	trace.EX_stall  <= EX_stall;
 	trace.WB_stall  <= WB_stall;
 
-  trace.halt <= '1' when (state = st_halt) else '0';
+  trace.halt <= '1' when (state = st_halt and ID.insn.rdy = '0' and
+                    ID2.insn.rdy = '0' and AG.insn.rdy = '0' and
+                    MEM.insn.rdy = '0' and EX.insn.rdy = '0' and
+                    WB.insn.rdy = '0')
+                else '0';
 
 	debugger: hw_debugger
 	generic map

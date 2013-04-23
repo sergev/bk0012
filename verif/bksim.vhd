@@ -178,14 +178,11 @@ begin
   clock_gen : process                   -- Generate main clock
   begin
     if reset = '1' then                 -- Initial state
-      irq               <= '0';
-      ivec              <= x"00";
+      irq  <= '0';
+      ivec <= x"00";
     end if;
 
-    if trace.halt = '1' and trace.ID_insn.rdy = '0' and trace.ID2_insn.rdy = '0' and
-       trace.AG_insn.rdy = '0' and trace.MEM_insn.rdy = '0' and
-       trace.EX_insn.rdy = '0' and trace.WB_insn.rdy = '0'
-    then                                -- CPU halted
+    if trace.halt = '1' then            -- CPU halted
       report "Processor halted";
       wait;
     end if;

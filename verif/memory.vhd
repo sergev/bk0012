@@ -83,7 +83,6 @@ architecture preloaded of memory is
           ch := NUL;                            -- End of line
           return;
         end if;
---report character'image(ch);
       end loop;
       result := 0;
       while (ch >= '0' and ch <= '7') loop      -- Read octal number
@@ -93,7 +92,6 @@ architecture preloaded of memory is
           ch := NUL;
           exit;
         end if;
---report character'image(ch);
       end loop;
       word := result;
     end read_oct;
@@ -104,12 +102,10 @@ architecture preloaded of memory is
     while not endfile(fd) loop
       readline(fd, L);
       read(L, ch, succeed);                     -- Get first symbol
---report character'image(ch);
       if succeed and ch >= '0' and ch <= '7' then
         read_oct(L, ch, addr);                  -- Get octal address
         while ch /= NUL loop
           read_oct(L, ch, word);                -- Get octal word, ignore the rest
---report integer'image(addr) & " <= " & integer'image(word);
           mem(addr/2) := to_bitvector(std_logic_vector(to_unsigned(word, 16)));
           addr := addr + 2;
         end loop;
@@ -148,32 +144,18 @@ begin
           if p1_byteenable(1) = '1' then
             mem(p1_index)(15 downto 8) := to_bitvector(p1_writedata(15 downto 8));
           end if;
-          if p1_index = 8#177566# / 2 then
-            report "Output " & character'image(character'val(to_integer(unsigned(p1_writedata(7 downto 0)))));
-          end if;
           if p1_index = 8#000406# / 2 then
             report "Pass " & integer'image(to_integer(unsigned(p1_writedata)));
           end if;
           if p1_index = 8#000404# / 2 then
             report "Test " & integer'image(to_integer(unsigned(p1_writedata)));
           end if;
-          if p1_index = 0 then
-            report "Output " & character'image(character'val(to_integer(unsigned(p1_writedata(7 downto 0)))));
-          end if;
 
         --
         -- Read cycle on port 1
         --
         elsif p1_read = '1' then
-          case p1_index is
-            when 8#177564# / 2 =>       -- Status of output port
-              p1_readdata <= std_logic_vector(to_unsigned(8#200#, 16));
-              --report "Poll output";
---            when 8#161376# / 2 =>       -- Address of output port
---              p1_readdata <= std_logic_vector(to_unsigned(8#177566#, 16));
-            when others =>
-              p1_readdata <= To_X01(mem(p1_index));
-          end case;
+          p1_readdata <= To_X01(mem(p1_index));
           p1_readdatavalid <= '1';
           wait until clk = '1';
           p1_readdatavalid <= '0';
