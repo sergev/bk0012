@@ -7,9 +7,6 @@ package textio is
 	procedure hwrite(L: inout line; value: in std_logic_vector;
 			justified: in side := RIGHT; field: in width := 0);
 
-	procedure owrite(L: inout line; value: in std_logic_vector;
-			justified: in side := RIGHT; field: in width := 0);
-
 	procedure print(message: string);
 	procedure print(message: string; value: std_logic_vector);
 
@@ -65,45 +62,6 @@ package body textio is
 		end loop;
 		write(L, s, justified, field);
 	end hwrite;
-
-	procedure owrite(
-    L         : inout line;
-    value     : in    std_logic_vector;
-		justified : in    side := RIGHT;
-    field     : in    width := 0
-  ) is
-		variable tri : std_logic_vector(0 to 2);
-		constant ne  : integer := value'length/3;
-		variable bv  : std_logic_vector(0 to value'length-1) := value;
-		variable s   : string(1 to ne);
-	begin
-		if value'length mod 3 /= 0 then
-			assert FALSE report "OWRITE Error: vector length not multiple of 3";
-			return;
-		end if;
-
-		for i in 0 to ne-1 loop
-			tri := bv(3*i to 3*i+2);
-			case tri is
-				when o"0"   => s(i+1) := '0';
-				when o"1"   => s(i+1) := '1';
-				when o"2"   => s(i+1) := '2';
-				when o"3"   => s(i+1) := '3';
-				when o"4"   => s(i+1) := '4';
-				when o"5"   => s(i+1) := '5';
-				when o"6"   => s(i+1) := '6';
-				when o"7"   => s(i+1) := '7';
-				when "--U"  => s(i+1) := 'u';
-				when "-U-"  => s(i+1) := 'u';
-				when "U--"  => s(i+1) := 'u';
-				when "--X"  => s(i+1) := 'x';
-				when "-X-"  => s(i+1) := 'x';
-				when "X--"  => s(i+1) := 'x';
-				when others => s(i+1) := '?';
-			end case;
-		end loop;
-		write(L, s, justified, field);
-	end owrite;
 
 	procedure print(message: string) is
     variable L : line;

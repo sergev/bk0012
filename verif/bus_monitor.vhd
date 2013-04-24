@@ -4,6 +4,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.std_logic_textio.all;
 use std.textio.all;
 use work.iface.all;
 use work.textio.all;
@@ -59,6 +60,7 @@ begin
       variable latch_instr_address: std_logic_vector(31 downto 0);
       variable latch_data_address: std_logic_vector(31 downto 0);
       variable latch_io_address: std_logic_vector(31 downto 0);
+      variable old_psw: std_logic_vector(15 downto 0);
 
       procedure print_insn (insn: insn_trace_type; tag: string) is
       begin
@@ -97,9 +99,32 @@ begin
         end if;
       end print_insn;
 
+      procedure write_psw (psw: std_logic_vector(15 downto 0)) is
+      begin
+        if psw(15 downto 14) = "00" then
+            write(L, string'(".."));
+        else
+            write(L, psw(15 downto 14));
+        end if;
+        if psw(13 downto 12) = "00" then
+            write(L, string'(".."));
+        else
+            write(L, psw(13 downto 12));
+        end if;
+        write(L, string'("----"));
+        if psw(7) = '0' then write(L, string'(".")); else write(L, string'("P")); end if;
+        write(L, string'("--"));
+        if psw(4) = '0' then write(L, string'(".")); else write(L, string'("T")); end if;
+        if psw(3) = '0' then write(L, string'(".")); else write(L, string'("N")); end if;
+        if psw(2) = '0' then write(L, string'(".")); else write(L, string'("Z")); end if;
+        if psw(1) = '0' then write(L, string'(".")); else write(L, string'("V")); end if;
+        if psw(0) = '0' then write(L, string'(".")); else write(L, string'("C")); end if;
+      end write_psw;
+
     begin
       write(L, string'("Trace file """ & TRACE_FILE_NAME) & """");
       writeline(output, L);
+      old_psw := (others => '0');
 
       loop
         -- Wait for a command, valid on leading edge of clk
@@ -198,6 +223,14 @@ begin
             write(L, string'(")    sp = "));
             owrite(L, "00" & trace.gpr(6));
             writeline(fd, L);
+          end if;
+          if trace.psw /= old_psw then
+            write(L, '(');
+            write(L, integer'image(now / CLOCK_PERIOD));
+            write(L, string'(")    psw = "));
+            write_psw(trace.psw);
+            writeline(fd, L);
+            old_psw := trace.psw;
           end if;
 
           --

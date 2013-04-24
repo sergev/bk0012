@@ -789,7 +789,7 @@ begin
   ID.insn.pc <= ibuffer_out.pc & "0";
   ID.insn.len <= ibuffer_out.insn_len;
   ID.insn.opcode <= ibuffer_out.insn;
-  ID.insn.rdy <= '1' when (ibuffer_out.insn_rdy = '1' and state = st_start) else '0';
+  ID.insn.rdy <= '1' when (ibuffer_out.insn_rdy = '1' and (state = st_start or state = st_rti)) else '0';
   ID.insn.immed1 <= ibuffer_out.immed1;
   ID.insn.immed2 <= ibuffer_out.immed2;
   ID.insn.immed1_rdy <= ibuffer_out.immed1_rdy;
@@ -815,6 +815,7 @@ begin
                     MEM.insn.rdy = '0' and EX.insn.rdy = '0' and
                     WB.insn.rdy = '0')
                 else '0';
+  trace.psw <= psw;
 
 	debugger: hw_debugger
 	generic map

@@ -155,6 +155,7 @@ package iface is
 		ID_insn, ID2_insn, AG_insn, MEM_insn, EX_insn, WB_insn: insn_trace_type;
 		gpr: word_vector(0 to 6);
 		gpr_mask: std_logic_vector(0 to 6);
+		psw: std_logic_vector(WORD_SIZE-1 downto 0);
 	end record;
 
 	function alu_oper_toString(op: alu_oper_type) return string;
