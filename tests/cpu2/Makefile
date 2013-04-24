@@ -13,7 +13,7 @@ CPPFLAGS	=
 LDFLAGS		= -a0
 GHDLFLAGS       = -fexplicit --ieee=synopsys --workdir=../../verif
 
-SOURCES		= instructions.S
+SOURCES		= cpu.bin
 
 all:		input.oct
 
@@ -25,17 +25,8 @@ clean:
 run:		input.oct
 		cp -p $< memory.oct
 #		$(GHDL) -r $(GHDLFLAGS) bksim --stop-time=1ms --ieee-asserts=disable 2>&1 | tee run.log
-		../../verif/bksim --vcdgz=output.vcd.gz --stop-time=1200us --ieee-asserts=disable 2>&1 | tee run.log
+		../../verif/bksim --vcdgz=output.vcd.gz --stop-time=14ms --ieee-asserts=disable 2>&1 | tee run.log
 		@rm memory.oct
 
 input.oct:      $(SOURCES)
-		$(CC) $(CPPFLAGS) -c $< -o input.o
-		$(LD) $(LDFLAGS) input.o -o input.bin
-		$(DISASM) -a0 input.bin > $@
-		@rm input.bin input.o
-
-.s.oct:
-		$(AS) $(ASFLAGS) $< -o $*.o
-		$(LD) $(LDFLAGS) $*.o -o $*.bin
-		$(DISASM) -a0 $*.bin > $@
-		@rm $*.bin
+		$(DISASM) -b -a0 $< > $@
