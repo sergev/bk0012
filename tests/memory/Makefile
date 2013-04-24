@@ -13,19 +13,19 @@ CPPFLAGS	=
 LDFLAGS		= -a0
 GHDLFLAGS       = -fexplicit --ieee=synopsys --workdir=../../verif
 
-SOURCES		= cpu.bin
+SOURCES		= memory.bin
 
 all:		input.oct
 
 install:
 
 clean:
-		rm -f *~ *.o *.log *.vcd.gz *.vcd core
+		rm -f *~ *.o *.log *.vcd.gz *.vcd memory.oct core
 
 run:		input.oct
 		cp -p $< memory.oct
-		$(GHDL) -r $(GHDLFLAGS) bksim --vcdgz=output.vcd.gz --stop-time=14ms --ieee-asserts=disable 2>&1 | tee run.log
-#		../../verif/bksim --vcdgz=output.vcd.gz --stop-time=14ms --ieee-asserts=disable 2>&1 | tee run.log
+		$(GHDL) -r $(GHDLFLAGS) bksim --vcdgz=output.vcd.gz --stop-time=260ms --ieee-asserts=disable 2>&1 | tee run.log
+#		../../verif/bksim --vcdgz=output.vcd.gz --stop-time=260ms --ieee-asserts=disable 2>&1 | tee run.log
 		@rm memory.oct
 
 input.oct:      $(SOURCES)

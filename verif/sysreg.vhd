@@ -52,7 +52,6 @@ begin
 
     -- Process sysreg cycles.
     loop
-
       -- Wait for a command, valid on leading edge of clk
       wait until clk = '1';
 
