@@ -24,8 +24,8 @@ clean:
 
 run:		input.oct
 		cp -p $< memory.oct
-		$(GHDL) -r $(GHDLFLAGS) bksim --vcdgz=output.vcd.gz --stop-time=14ms --ieee-asserts=disable 2>&1 | tee run.log
-#		../../verif/bksim --vcdgz=output.vcd.gz --stop-time=14ms --ieee-asserts=disable 2>&1 | tee run.log
+#		$(GHDL) -r $(GHDLFLAGS) bksim --vcdgz=output.vcd.gz --stop-time=14ms --ieee-asserts=disable 2>&1 | tee run.log
+		../../verif/bksim --vcdgz=output.vcd.gz --stop-time=14ms --ieee-asserts=disable 2>&1 | tee run.log
 		@rm memory.oct
 
 input.oct:      $(SOURCES)

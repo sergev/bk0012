@@ -111,9 +111,9 @@ begin
         else
             write(L, psw(13 downto 12));
         end if;
-        write(L, string'("----"));
+        write(L, string'("xxxx"));
         if psw(7) = '0' then write(L, string'(".")); else write(L, string'("P")); end if;
-        write(L, string'("--"));
+        write(L, string'("xx"));
         if psw(4) = '0' then write(L, string'(".")); else write(L, string'("T")); end if;
         if psw(3) = '0' then write(L, string'(".")); else write(L, string'("N")); end if;
         if psw(2) = '0' then write(L, string'(".")); else write(L, string'("Z")); end if;

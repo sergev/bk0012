@@ -75,9 +75,9 @@ tps:    .word   0177564
 tpb:    .word   0177566
 mark2:  mark    2
 endpas: .word   05015           // " к проход"
-        .byte   040, 0113, 040, 0160, 0120, 0117, 0130, 0117, 0144, 0
+        < K PROHOD\r\n\0>
 power:  .word   05015           // "питание"
-        .byte   0160, 0151, 0124, 0101, 0110, 0151, 0105, 0
+        <PITANIE\r\n\0>
 
         .=      zero+0530
 start:  mov	$start, sp

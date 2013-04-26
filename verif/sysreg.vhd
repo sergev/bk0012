@@ -40,6 +40,14 @@ architecture behavior of sysreg is
   constant UART_TS_READY        : integer := 8#0200#;   -- Transmit available, read only
   constant UART_TS_IE           : integer := 8#0100#;   -- Interrupt enable
 
+-- procedure uart_putchar (v : integer);
+
+  procedure uart_putchar (v : integer) is
+  begin
+    assert false severity failure;
+  end uart_putchar;
+  attribute foreign of uart_putchar : procedure is "VHPIDIRECT uart_putchar";
+
 begin
 
   sreg : process is
@@ -64,7 +72,8 @@ begin
       if io_write = '1' then
         case io_index is
           when UART_TRANSMIT_DATA =>
-            report "Output " & character'image(character'val(to_integer(unsigned(io_writedata(7 downto 0)))));
+            --report "Output " & character'image(character'val(to_integer(unsigned(io_writedata(7 downto 0)))));
+            uart_putchar (to_integer(unsigned(io_writedata(7 downto 0))));
           when others =>
             report "I/O write unknown port " & integer'image(io_index);
         end case;

@@ -10,6 +10,7 @@ OBJ             = resetgen.o \
                   alu.o \
                   sysreg.o \
                   dummy_debugger.o \
+                  uart.o \
                   moonshiner11.o
 
 GHDL            = ghdl
@@ -31,7 +32,7 @@ runrun:
 	$(GHDL) -r $(GHDLFLAGS) $(PROG) --ieee-asserts=disable
 
 $(PROG):        $(OBJ)
-	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) -Wl,uart.o $@
 
 view:
 	gtkwave $(PROG).vcd databus.gtkw
