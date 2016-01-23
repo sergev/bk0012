@@ -103,6 +103,7 @@ fatal()
 
 void
 error(severe, s)
+        int severe;
 	char *s;
 {
 	if (filname) {
@@ -182,6 +183,7 @@ mkfsym(s)
 struct nlist *
 lookloc(limit, r)
 	register struct nlocal *limit;
+	int r;
 {
 	register struct nlocal *clp;
 	register int sn;
@@ -467,6 +469,7 @@ symreloc()
 
 int
 load1(libflg, loff)
+        int libflg;
 	long loff;
 {
 	register struct nlist *sp, **hp, ***lp;
@@ -716,6 +719,7 @@ void
 load2td(words, lp, creloc, b1, b2)
 	unsigned int words;
 	struct nlocal *lp;
+	int creloc;
 	FILE *b1, *b2;
 {
 	register int r, t;
@@ -885,6 +889,7 @@ finishout()
 
 int
 main(argc, argv)
+        int argc;
 	char **argv;
 {
 	register int c;

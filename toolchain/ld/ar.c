@@ -345,6 +345,7 @@ stats()
 
 void
 mesg(c)
+        int c;
 {
 	if (flg['v'-'a'])
 		if (c != 'c' || flg['v'-'a'] > 1)
@@ -611,6 +612,7 @@ usage()
 
 int
 main(argc, argv)
+        int argc;
 	char *argv[];
 {
 	register int i;

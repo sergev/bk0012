@@ -1,5 +1,5 @@
 DESTDIR		= /usr/local
-CC              = gcc -m32 -Werror
+CC              = gcc -m32
 CFLAGS		= -O -g -Wall -DDESTDIR=\"$(DESTDIR)\"
 
 all:		c0 c1

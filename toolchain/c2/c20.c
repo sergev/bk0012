@@ -86,6 +86,7 @@ void	xjump();
 void	backjmp();
 
 int main(argc, argv)
+int argc;
 char **argv;
 {
 	register int niter, maxiter, isend;
@@ -390,6 +391,7 @@ struct node *at;
 
 char *
 copy(na, ap, ap2)
+        int na;
 	char *ap, *ap2;
 {
 	register char *p, *np;

@@ -972,6 +972,7 @@ disbin (fname)
 
 int
 main (argc, argv)
+        int argc;
 	register char **argv;
 {
 	register char *cp;

@@ -80,6 +80,7 @@ writehdr(fd, hdr)
 int
 copy(name, fr, to, size)
 	char *name;
+	int fr, to;
 	long size;
 {
 	register int s, n;
@@ -157,6 +158,7 @@ out:
 
 int
 main(argc, argv)
+        int argc;
 	char **argv;
 {
 	register int i;
